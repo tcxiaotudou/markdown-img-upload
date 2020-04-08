@@ -2,8 +2,8 @@ package utils
 
 import (
 	"bufio"
-	upload "hexo-img-upload/interface"
 	"io/ioutil"
+	upload "markdown-img-upload/interface"
 	"os"
 	"regexp"
 	"strings"

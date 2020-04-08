@@ -3,13 +3,10 @@ package main
 import (
 	"flag"
 	"gopkg.in/ini.v1"
-	sms "hexo-img-upload/upload"
-	"hexo-img-upload/utils"
 	"log"
-)
-
-const (
-	FILE_PATH = "config.ini"
+	"markdown-img-upload/sms"
+	"markdown-img-upload/tencent"
+	"markdown-img-upload/utils"
 )
 
 type Config struct {
@@ -28,14 +25,14 @@ func main() {
 }
 
 func GetFilePath(fileName string) string {
-	filePath, err := ReadConfig(FILE_PATH) //也可以通过os.arg或flag从命令行指定配置文件路径
+	filePath, err := ReadConfig("config.ini") //也可以通过os.arg或flag从命令行指定配置文件路径
 	if err != nil {
 		log.Fatal(err)
 	}
 	return filePath + fileName
 }
 
-//读取配置文件
+//读取配置文件.获取markdown文档目录
 func ReadConfig(path string) (string, error) {
 	//var config Config
 	conf, err := ini.Load(path) //加载配置文件
@@ -52,6 +49,8 @@ func UploadImg(filePath string, source string) error {
 	switch source {
 	case "sms":
 		utils.ModifyImg(filePath, new(sms.SMMS))
+	case "tencent":
+		utils.ModifyImg(filePath, new(tencent.Tencent))
 	}
 	return nil
 }

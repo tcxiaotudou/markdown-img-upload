@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	SMS_URL = "https://sm.ms/api/v2/upload"
+	SMS_URL = "https://sm.ms/api/v2/sms"
 )
 
 type SMMS struct{}
