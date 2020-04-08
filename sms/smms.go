@@ -51,12 +51,12 @@ func (smms *SMMS) Upload(path string) (string, error) {
 	if err := json.NewDecoder(resp.Body).Decode(&ret); err != nil {
 		return cloudPath, err
 	}
-	log.Println("response: ", ret)
 	success := ret["success"].(bool)
 	if success {
 		cloudPath = ret["data"].(map[string]interface{})["url"].(string)
 	} else {
 		cloudPath = ret["images"].(string)
 	}
+	log.Println("resultURL: ", cloudPath)
 	return cloudPath, nil
 }

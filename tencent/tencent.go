@@ -3,8 +3,8 @@ package tencent
 import (
 	"context"
 	"github.com/tencentyun/cos-go-sdk-v5"
-	"gopkg.in/ini.v1"
 	"log"
+	"markdown-img-upload/utils"
 	"net/http"
 	"net/url"
 	"path/filepath"
@@ -17,7 +17,14 @@ type Tencent struct {
 }
 
 func (t *Tencent) Upload(path string) (string, error) {
-	t = ParseConfig()
+	bucketURL := utils.UploadConfig.TencentBucketURL
+	secretID := utils.UploadConfig.TencentSecretID
+	secretKey := utils.UploadConfig.TencentSecretKey
+	t = &Tencent{
+		BucketURL: bucketURL,
+		SecretID:  secretID,
+		SecretKey: secretKey,
+	}
 	u, _ := url.Parse(t.BucketURL)
 	b := &cos.BaseURL{BucketURL: u}
 	c := cos.NewClient(b, &http.Client{
@@ -32,24 +39,8 @@ func (t *Tencent) Upload(path string) (string, error) {
 		log.Println(err)
 		return "", err
 	}
+	defer response.Body.Close()
 	resultURL := response.Request.URL.String()
 	log.Println("resultURL: ", resultURL)
-	response.Body.Close()
 	return resultURL, nil
-}
-
-func ParseConfig() *Tencent {
-	conf, err := ini.Load("config.ini") //加载配置文件
-	if err != nil {
-		log.Println("load config file fail!")
-		panic(err)
-	}
-	bucketURL := conf.Section("tencent").Key("tencent.bucket_url").String()
-	secretID := conf.Section("tencent").Key("tencent.secret_id").String()
-	secretKey := conf.Section("tencent").Key("tencent.secret_key").String()
-	return &Tencent{
-		BucketURL: bucketURL,
-		SecretID:  secretID,
-		SecretKey: secretKey,
-	}
 }
