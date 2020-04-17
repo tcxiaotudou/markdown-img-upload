@@ -6,7 +6,7 @@
 
 ## 🔮 下载使用
 
-你可以选择直接  [下载](https://github.com/tcxiaotudou/markdown-img-upload/releases/tag/v1.0.0)，然后进行解压
+你可以选择直接  [下载](https://github.com/tcxiaotudou/markdown-img-upload/releases/tag/v2.0)，然后进行解压
 
 #### 修改配置
 
