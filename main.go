@@ -12,7 +12,7 @@ func main() {
 	var source string
 	var file string
 	flag.StringVar(&source, "source", "sms", "上传源")
-	flag.StringVar(&file, "file", "测试.md", "文件名")
+	flag.StringVar(&file, "file", "", "文件名")
 	//解析命令行参数
 	flag.Parse()
 	path := utils.GetFilePath(file)
