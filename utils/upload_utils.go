@@ -18,6 +18,7 @@ type Config struct {
 	TencentBucketURL string `ini:"tencent_bucket_url"`
 	TencentSecretID  string `ini:"tencent_secret_id"`
 	TencentSecretKey string `ini:"tencent_secret_key"`
+	SmsToken         string `ini:"sms_token"`
 }
 
 // 通过文件名，加载配置后拼接完整文件路径

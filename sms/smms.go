@@ -3,45 +3,50 @@ package sms
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
+	"markdown-img-upload/utils"
 	"mime/multipart"
 	"net/http"
 	"os"
-	"path/filepath"
 )
 
 const (
 	SMS_URL = "https://sm.ms/api/v2/upload"
 )
 
-type SMMS struct{}
+type SMMS struct {
+	token string
+}
 
 func (smms *SMMS) Upload(path string) (string, error) {
 	cloudPath := ""
-	buf := new(bytes.Buffer)
-	writer := multipart.NewWriter(buf)
-	fn, _ := filepath.Abs(path)
-	formFile, err := writer.CreateFormFile("smfile", fn)
-
+	// 打开要上传的文件
+	file, err := os.Open(path)
+	if err != nil {
+		log.Fatal("open file err:", err)
+	}
+	defer file.Close()
+	body := &bytes.Buffer{}
+	// 创建一个multipart类型的写文件
+	writer := multipart.NewWriter(body)
+	formFile, err := writer.CreateFormFile("smfile", path)
 	if err != nil {
 		return "", err
 	}
-	// 读取文件并定稿表单
-	srcFile, err := os.Open(fn)
+	// 将源复制到目标，将file写入到part   是按默认的缓冲区32k循环操作的，不会将内容一次性全写入内存中,这样就能解决大文件的问题
+	_, err = io.Copy(formFile, file)
+	err = writer.Close()
 	if err != nil {
-		return cloudPath, err
+		fmt.Println("write file err:", err)
 	}
-	defer srcFile.Close()
-	_, err = io.Copy(formFile, srcFile)
-	if err != nil {
-		return cloudPath, err
-	}
-	//_ = writer.WriteField("file_id", "0") // 额外参数，比如七牛上传时需要提供token
-	// 发送表单
-	contentType := writer.FormDataContentType()
-	writer.Close() //发送之前必须调用Close()以写入结尾行
-	resp, err := http.Post(SMS_URL, contentType, buf)
+	request, err := http.NewRequest("POST", SMS_URL, body)
+	request.Header.Set("Content-Type", writer.FormDataContentType())
+	token := utils.UploadConfig.SmsToken
+	request.Header.Set("Authorization", token)
+	clt := http.Client{}
+	resp, err := clt.Do(request)
 	// mutex.Unlock()
 	if err != nil {
 		return cloudPath, err
@@ -55,7 +60,7 @@ func (smms *SMMS) Upload(path string) (string, error) {
 	if success {
 		cloudPath = ret["data"].(map[string]interface{})["url"].(string)
 	} else {
-		cloudPath = ret["images"].(string)
+		log.Fatal("upload fail: ", ret)
 	}
 	log.Println("resultURL: ", cloudPath)
 	return cloudPath, nil

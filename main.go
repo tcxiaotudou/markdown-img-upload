@@ -18,7 +18,7 @@ func main() {
 	path := utils.GetFilePath(file)
 	err := UploadImg(path, source)
 	if err != nil {
-		log.Fatal("上传失败")
+		log.Fatal("上传失败: ", err)
 		return
 	}
 }
